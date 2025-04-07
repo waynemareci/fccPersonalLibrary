@@ -22,7 +22,7 @@ module.exports = function (app) {
     .route('/api/books')
     .get(async function (req, res) {
       const gotBooks = await Book.find({})
-      console.log(gotBooks)
+      //console.log(gotBooks)
       res.send(gotBooks)
       //response will be array of book objects
       //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
@@ -47,7 +47,9 @@ module.exports = function (app) {
       }
     })
 
-    .delete(function (req, res) {
+    .delete(async function (req, res) {
+      console.log("in delete all code")
+      await Book.deleteMany({})
       //if successful response will be 'complete delete successful'
     })
 
@@ -64,14 +66,27 @@ module.exports = function (app) {
       //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
     })
 
-    .post(function (req, res) {
+    .post(async function (req, res) {
       let bookid = req.params.id
       let comment = req.body.comment
+      console.log("in post by id; comment is " + comment)
+      if (!req.body.comment) {res.send("missing required field comment");return}
+      const update = {$push: {"comments": req.body.comment}}
+      try {
+      const updatedEntry = await Book.findOneAndUpdate({_id:bookid},update,{new:true})
+      console.log("in post by id; updatedEntry is " + updatedEntry)
+      const updatedUpdatedEntry = await Book.findOneAndUpdate({_id:bookid},{"commentcount": updatedEntry.commentcount+1})
+      console.log("updatedUpdatedEntry is " + updatedUpdatedEntry)
+      res.send(updatedUpdatedEntry)
+      } catch {
+        res.send("no book exists")
+      }
       //json res format same as .get
     })
 
     .delete(function (req, res) {
       let bookid = req.params.id
+      console.log("in delete by id code")
       //if successful response will be 'delete successful'
     })
 }

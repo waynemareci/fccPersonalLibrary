@@ -13,7 +13,8 @@ module.exports = function (app) {
   const Schema = mongoose.Schema
   const bookSchema = new Schema({
     title: { type: String, required: true },
-    commentcount: { type: Number, default:0}
+    commentcount: { type: Number, default:0},
+    comments: [String]
   })
   const Book = mongoose.model("Book",bookSchema)
 
@@ -52,8 +53,14 @@ module.exports = function (app) {
 
   app
     .route('/api/books/:id')
-    .get(function (req, res) {
+    .get(async function (req, res) {
       let bookid = req.params.id
+      const foundBook = await Book.findById(bookid)
+      if (!foundBook) {
+        res.send("no book exists")
+        return
+      }
+      res.send(foundBook)
       //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
     })
 

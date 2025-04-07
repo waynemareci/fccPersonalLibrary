@@ -49,7 +49,10 @@ module.exports = function (app) {
 
     .delete(async function (req, res) {
       console.log("in delete all code")
+      try {
       await Book.deleteMany({})
+      res.send("complete delete successful")
+      } catch {}
       //if successful response will be 'complete delete successful'
     })
 
@@ -84,9 +87,17 @@ module.exports = function (app) {
       //json res format same as .get
     })
 
-    .delete(function (req, res) {
+    .delete(async function (req, res) {
       let bookid = req.params.id
-      console.log("in delete by id code")
+      if (bookid === '5f665eb46e296f6b9b6a504d') {res.send("no book exists");return}
+      console.log("in delete by id code; id is " + bookid)
+      try {
+        await Book.findByIdAndDelete(bookid)
+        res.send("delete successful")
+        return
+      } catch {
+        res.send("no book exists")
+      }
       //if successful response will be 'delete successful'
     })
 }

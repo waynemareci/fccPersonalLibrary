@@ -12,13 +12,17 @@ module.exports = function (app) {
   const mongoose    = require('mongoose');
   const Schema = mongoose.Schema
   const bookSchema = new Schema({
-    title: { type: String, required: true }
+    title: { type: String, required: true },
+    commentcount: { type: Number, default:0}
   })
   const Book = mongoose.model("Book",bookSchema)
 
   app
     .route('/api/books')
     .get(async function (req, res) {
+      const gotBooks = await Book.find({})
+      console.log(gotBooks)
+      res.send(gotBooks)
       //response will be array of book objects
       //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
     })
